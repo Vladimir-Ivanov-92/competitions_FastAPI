@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "competitions-fastapi"
+version = "0.1.0"
+description = ""
+authors = ["vova2092 <vovai2092@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.2"
+sqlalchemy = "^2.0.25"
+alembic = "^1.13.1"
+uvicorn = "^0.27.0.post1"
+
+
+[tool.poetry.group.dev.dependencies]
+isort = "^5.13.2"
+flake8 = "^7.0.0"
+mypy = "^1.8.0"
+black = "^24.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
