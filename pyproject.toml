@@ -10,7 +10,9 @@ python = "^3.11"
 fastapi = "^0.109.2"
 sqlalchemy = "^2.0.25"
 alembic = "^1.13.1"
-uvicorn = "^0.27.0.post1"
+asyncpg = "^0.29.0"
+uvicorn = {extras = ["standard"], version = "^0.27.0.post1"}
+greenlet = "^3.0.3"
 
 
 [tool.poetry.group.dev.dependencies]

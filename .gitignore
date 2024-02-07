@@ -12,3 +12,4 @@ tests/migrations/versions/
 .venv
 /.mypy_cache/
 /.env
+/.idea
