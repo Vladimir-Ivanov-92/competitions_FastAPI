@@ -37,6 +37,6 @@ class AthleteOnTournamentsResponse(BaseModel):
 class TournamentResponseList(BaseModel):
     id: int
     datetime: datetime
-    sport_id: int
+    sport_id: str
     name: str
     athletes: list[AthleteOnTournamentsResponse]
