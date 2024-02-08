@@ -19,3 +19,17 @@ class TournamentResponseCreate(BaseModel):
     datetime: datetime
     sport_id: int
     name: str
+
+class AthleteOnTournamentsResponse(BaseModel):
+    id: int
+    first_name: str
+    last_name: str
+    country: str
+
+
+class TournamentResponseList(BaseModel):
+    id: int
+    datetime: datetime
+    sport_id: int
+    name: str
+    athletes: list[AthleteOnTournamentsResponse]

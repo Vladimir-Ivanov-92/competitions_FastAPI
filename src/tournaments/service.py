@@ -17,9 +17,30 @@ class TournamentCRUD:
     """Содержит методы для CRUD операций с объектами Tournament"""
 
     @staticmethod
+    async def get_tournaments_with_athletes(
+            session: AsyncSession,
+    ) -> list[Tournament]:
+
+        try:
+            query = (
+                select(Tournament)
+                .options(selectinload(Tournament.athletes))
+                .order_by(Tournament.id)
+            )
+            result = await session.execute(query)
+            tournaments: list[Tournament] = list(result.scalars().all())
+            return tournaments
+        except Exception as e:
+            raise ResponseError(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                message=f" Ошибка: {e}",
+                e=e,
+            )
+
+    @staticmethod
     async def create_tournament(
-        tournament_data: TournamentCreate,
-        session: AsyncSession,
+            tournament_data: TournamentCreate,
+            session: AsyncSession,
     ) -> Tournament:
         """Добавление данных по турниру в БД"""
 

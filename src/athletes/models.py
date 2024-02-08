@@ -4,7 +4,6 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
-from src.tournaments.models import tournament_athlete_association_table
 
 if TYPE_CHECKING:
     from src.tournaments.models import Tournament
@@ -36,7 +35,7 @@ class Athlete(Base):
 
     sport: Mapped["Sport"] = relationship(back_populates="athletes")
     tournaments: Mapped[list["Tournament"]] = relationship(
-        secondary=tournament_athlete_association_table, back_populates="athletes"
+        secondary="tournament_athlete_associations", back_populates="athletes"
     )
 
     def __repr__(self):

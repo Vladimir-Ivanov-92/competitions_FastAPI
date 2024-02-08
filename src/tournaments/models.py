@@ -10,18 +10,19 @@ if TYPE_CHECKING:
     from src.athletes.models import Athlete, Sport
 
 
-#  Создание ассоциативной таблицы Турниры и Спортсмены для M:M
-tournament_athlete_association_table = Table(
-    "tournament_athlete_associations",
-    Base.metadata,
-    Column("id", Integer, primary_key=True),
-    Column("tournament_id", ForeignKey("tournaments.id"), nullable=False),
-    Column("athlete_id", ForeignKey("athletes.id"), nullable=False),
-    Column("place", Integer, nullable=True),
-    UniqueConstraint(
-        "tournament_id", "athlete_id", name="idx_unique_tournament_athlete"
-    ),
-)
+class TournamentAthleteAssociations(Base):
+    """Ассоциативная модель для связи М:М Турниров и Спортсменыов"""
+    __tablename__ = "tournament_athlete_associations"
+    __table_args__ = (
+        UniqueConstraint(
+            "tournament_id", "athlete_id", name="idx_unique_tournament_athlete"
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tournament_id: Mapped[int] = mapped_column(ForeignKey("tournaments.id"))
+    athlete_id: Mapped[int] = mapped_column(ForeignKey("athletes.id"))
+    place: Mapped[int] = mapped_column(nullable=True)
 
 
 class Tournament(Base):
@@ -36,5 +37,5 @@ class Tournament(Base):
 
     sport: Mapped["Sport"] = relationship(back_populates="tournaments")
     athletes: Mapped[list["Athlete"]] = relationship(
-        secondary=tournament_athlete_association_table, back_populates="tournaments"
+        secondary="tournament_athlete_associations", back_populates="tournaments"
     )
