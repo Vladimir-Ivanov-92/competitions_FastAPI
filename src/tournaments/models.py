@@ -30,6 +30,7 @@ class Tournament(Base):
     __tablename__ = "tournaments"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(nullable=False, unique=True)
     datetime: Mapped[datetime]
     sport_id: Mapped[int] = mapped_column(ForeignKey("sports.id", ondelete="SET NULL"))
 
