@@ -57,8 +57,8 @@ async def get_competitions_from_month():
 
 @router.post("/", response_model=TournamentResponseCreate)
 async def create_tournament_handler(
-    tournament_data: TournamentCreate,
-    session: AsyncSession = Depends(get_async_session),
+        tournament_data: TournamentCreate,
+        session: AsyncSession = Depends(get_async_session),
 ):
     """Добавление данных спортсмена в БД"""
 
@@ -67,7 +67,7 @@ async def create_tournament_handler(
             tournament_data=tournament_data, session=session
         )
         tournament_response: TournamentResponseCreate = TournamentResponseCreate(
-            id=tournament.id, datetime=tournament.datetime, sport_id=tournament.sport_id
+            id=tournament.id, datetime=tournament.datetime, sport_id=tournament.sport_id, name=tournament.name
         )
         return tournament_response
     except ResponseError as e:

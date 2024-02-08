@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class Tournament(BaseModel):
     datetime: datetime
     sport_id: int
+    name: str
 
 
 class TournamentCreate(BaseModel):
@@ -17,3 +18,4 @@ class TournamentResponseCreate(BaseModel):
     id: int
     datetime: datetime
     sport_id: int
+    name: str
