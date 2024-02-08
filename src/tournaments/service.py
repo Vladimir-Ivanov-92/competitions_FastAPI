@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import select, Result, Row
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -22,10 +23,12 @@ class TournamentCRUD:
     ) -> Tournament:
         """Добавление данных по турниру в БД"""
         try:
+            # Добавление в БД объекта Tournament с переданными данными
             tournament = Tournament(**tournament_data.tournament.model_dump())
             session.add(tournament)
             await session.commit()
 
+            # Получение созданного объекта Tournament по ID
             tournament_for_add_athlete = await session.scalar(
                 select(Tournament)
                 .where(Tournament.id == tournament.id)
@@ -33,12 +36,15 @@ class TournamentCRUD:
                     selectinload(Tournament.athletes),
                 ),
             )
-
+            # Получение последовательности строк участвующих в турнире спортменов
             athletes_query = select(Athlete).filter(Athlete.id.in_(tournament_data.lst_athletes_id))
-            athletes = await session.execute(athletes_query)
+            result: Result = await session.execute(athletes_query)
+            athletes: Sequence[Row] = result.scalars().all()
 
-            tournament_for_add_athlete.athletes.extend(athletes.scalars().all())
+            # Добавление в ассоциативную таблицу спортсменов участвующих в турнире
+            tournament_for_add_athlete.athletes.extend(athletes)
             await session.commit()
+
             return tournament
         except IntegrityError as e:
             # Если указаны неверные данные
