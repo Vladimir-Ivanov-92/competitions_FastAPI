@@ -1,8 +1,8 @@
-from typing import Type
-
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.config import EXPIRE
 from src.athletes.models import Athlete
 from src.athletes.schemas import (
     AthleteCreate,
@@ -18,6 +18,7 @@ router = APIRouter(prefix="/athletes", tags=["athletes"])
 
 
 @router.get("/", response_model=list[AthleteResponseList])
+@cache(expire=EXPIRE)
 async def get_athletes_handler(session: AsyncSession = Depends(get_async_session)):
     """Получение данных всех спортсменов"""
 
@@ -39,22 +40,8 @@ async def get_athletes_handler(session: AsyncSession = Depends(get_async_session
         raise HTTPException(status_code=e.status, detail=f"{e.message}")
 
 
-@router.post("/", response_model=AthleteResponseCreate)
-async def create_athlete_handler(
-    athlete: AthleteCreate, session: AsyncSession = Depends(get_async_session)
-):
-    """Добавление данных спортсмена в БД"""
-
-    try:
-        athlete_instance: Athlete = await AthleteCRUD.create_athlete(
-            athlete=athlete, session=session
-        )
-        return athlete_instance
-    except ResponseError as e:
-        raise HTTPException(status_code=e.status, detail=f"{e.message}")
-
-
 @router.get("/{athlete_id}", response_model=AthleteResponseOne)
+@cache(expire=EXPIRE)
 async def get_athlete_handler(
     athlete_id: int, session: AsyncSession = Depends(get_async_session)
 ):
@@ -71,5 +58,20 @@ async def get_athlete_handler(
             sport_name=athlete.sport.name,
         )
         return athlete_responses
+    except ResponseError as e:
+        raise HTTPException(status_code=e.status, detail=f"{e.message}")
+
+
+@router.post("/", response_model=AthleteResponseCreate)
+async def create_athlete_handler(
+    athlete: AthleteCreate, session: AsyncSession = Depends(get_async_session)
+):
+    """Добавление данных спортсмена в БД"""
+
+    try:
+        athlete_instance: Athlete = await AthleteCRUD.create_athlete(
+            athlete=athlete, session=session
+        )
+        return athlete_instance
     except ResponseError as e:
         raise HTTPException(status_code=e.status, detail=f"{e.message}")

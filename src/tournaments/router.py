@@ -1,6 +1,10 @@
+from asyncio import sleep
+
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.config import EXPIRE
 from src.database import get_async_session
 from src.exceptions import ResponseError
 from src.tournaments.models import Tournament
@@ -15,8 +19,9 @@ router = APIRouter(prefix="/tournaments", tags=["tournaments"])
 
 
 @router.get("/", response_model=list[TournamentResponseList])
-async def get_athletes_handler(session: AsyncSession = Depends(get_async_session)):
-    """Получение данных всех спортсменов"""
+@cache(expire=EXPIRE)
+async def get_tournaments_handler(session: AsyncSession = Depends(get_async_session)):
+    """Получение данных всех турниров"""
 
     try:
         tournaments: list[Tournament] = (
@@ -31,10 +36,11 @@ async def get_athletes_handler(session: AsyncSession = Depends(get_async_session
 
 
 @router.get("/{year}/{month}", response_model=list[TournamentResponseList])
+@cache(expire=EXPIRE)
 async def get_tournaments_filter_year_month(
-    year: int, month: int, session: AsyncSession = Depends(get_async_session)
+        year: int, month: int, session: AsyncSession = Depends(get_async_session)
 ):
-    """Получение данных всех спортсменов"""
+    """Получение данных всех турниров с фильтром по (год, месяц)"""
 
     try:
         tournaments: list[Tournament] = (
@@ -45,6 +51,8 @@ async def get_tournaments_filter_year_month(
 
         tournaments_responses = await TournamentCRUD.to_response_format(tournaments)
 
+        await sleep(3)  # TODO DEL
+
         return tournaments_responses
     except ResponseError as e:
         raise HTTPException(status_code=e.status, detail=f"{e.message}")
@@ -52,10 +60,10 @@ async def get_tournaments_filter_year_month(
 
 @router.post("/", response_model=TournamentResponseCreate)
 async def create_tournament_handler(
-    tournament_data: TournamentCreate,
-    session: AsyncSession = Depends(get_async_session),
+        tournament_data: TournamentCreate,
+        session: AsyncSession = Depends(get_async_session),
 ):
-    """Добавление данных спортсмена в БД"""
+    """Добавление данных о турнире в БД"""
 
     try:
         tournament: Tournament = await TournamentCRUD.create_tournament(
