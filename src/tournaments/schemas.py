@@ -9,9 +9,14 @@ class Tournament(BaseModel):
     name: str
 
 
+class AthleteWithPlace(BaseModel):
+    athlete_id: int
+    place: int
+
+
 class TournamentCreate(BaseModel):
     tournament: Tournament
-    lst_athletes_id: list[int]
+    athletes_with_place: list[AthleteWithPlace]
 
 
 class TournamentResponseCreate(BaseModel):
@@ -20,11 +25,13 @@ class TournamentResponseCreate(BaseModel):
     sport_id: int
     name: str
 
+
 class AthleteOnTournamentsResponse(BaseModel):
     id: int
     first_name: str
     last_name: str
     country: str
+    place: int
 
 
 class TournamentResponseList(BaseModel):

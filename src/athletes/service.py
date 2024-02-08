@@ -59,7 +59,7 @@ class AthleteCRUD:
             await session.rollback()
             raise ResponseError(
                 status=status.HTTP_400_BAD_REQUEST,
-                message=f"Проверьте вводимые данные",
+                message="Проверьте вводимые данные",
                 e=e,
             )
         except Exception as e:

@@ -1,7 +1,6 @@
-from datetime import datetime
 from typing import Sequence
 
-from sqlalchemy import select, Result, Row
+from sqlalchemy import Result, Row, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -9,7 +8,7 @@ from starlette import status
 
 from src.athletes.models import Athlete
 from src.exceptions import ResponseError
-from src.tournaments.models import Tournament
+from src.tournaments.models import Tournament, TournamentAthleteAssociations
 from src.tournaments.schemas import TournamentCreate
 
 
@@ -18,13 +17,17 @@ class TournamentCRUD:
 
     @staticmethod
     async def get_tournaments_with_athletes(
-            session: AsyncSession,
+        session: AsyncSession,
     ) -> list[Tournament]:
 
         try:
             query = (
                 select(Tournament)
-                .options(selectinload(Tournament.athletes))
+                .options(
+                    selectinload(Tournament.athletes_associations).joinedload(
+                        TournamentAthleteAssociations.athlete
+                    )
+                )
                 .order_by(Tournament.id)
             )
             result = await session.execute(query)
@@ -39,8 +42,8 @@ class TournamentCRUD:
 
     @staticmethod
     async def create_tournament(
-            tournament_data: TournamentCreate,
-            session: AsyncSession,
+        tournament_data: TournamentCreate,
+        session: AsyncSession,
     ) -> Tournament:
         """Добавление данных по турниру в БД"""
 
@@ -61,21 +64,35 @@ class TournamentCRUD:
             session.add(tournament)
             await session.commit()
 
-            # Получение созданного объекта Tournament по ID
-            tournament_for_add_athlete = await session.scalar(
-                select(Tournament)
-                .where(Tournament.id == tournament.id)
-                .options(
-                    selectinload(Tournament.athletes),
-                ),
-            )
             # Получение последовательности строк участвующих в турнире спортменов
-            athletes_query = select(Athlete).filter(Athlete.id.in_(tournament_data.lst_athletes_id))
+            athletes_query = select(Athlete).filter(
+                Athlete.id.in_(
+                    [
+                        athlete.athlete_id
+                        for athlete in tournament_data.athletes_with_place
+                    ]
+                )
+            )
             result: Result = await session.execute(athletes_query)
             athletes: Sequence[Row] = result.scalars().all()
 
-            # Добавление в ассоциативную таблицу спортсменов участвующих в турнире
-            tournament_for_add_athlete.athletes.extend(athletes)
+            # Формируем список значений для вставки и добавляем значения в TournamentAthleteAssociations
+            values = [
+                {
+                    "tournament_id": tournament.id,
+                    "athlete_id": athlete.id,
+                    "place": athlete_with_place.place,
+                }
+                for athlete, athlete_with_place in zip(
+                    athletes, tournament_data.athletes_with_place
+                )
+            ]
+
+            insert_statement = TournamentAthleteAssociations.__table__.insert().values(
+                values
+            )
+            await session.execute(insert_statement)
+
             await session.commit()
 
             return tournament
@@ -84,7 +101,7 @@ class TournamentCRUD:
             await session.rollback()
             raise ResponseError(
                 status=status.HTTP_400_BAD_REQUEST,
-                message=f"Проверьте вводимые данные",
+                message="Проверьте вводимые данные",
                 e=e,
             )
         except Exception as e:

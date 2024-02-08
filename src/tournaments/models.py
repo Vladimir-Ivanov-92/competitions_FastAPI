@@ -12,6 +12,7 @@ if TYPE_CHECKING:
 
 class TournamentAthleteAssociations(Base):
     """Ассоциативная модель для связи М:М Турниров и Спортсменыов"""
+
     __tablename__ = "tournament_athlete_associations"
     __table_args__ = (
         UniqueConstraint(
@@ -23,6 +24,14 @@ class TournamentAthleteAssociations(Base):
     tournament_id: Mapped[int] = mapped_column(ForeignKey("tournaments.id"))
     athlete_id: Mapped[int] = mapped_column(ForeignKey("athletes.id"))
     place: Mapped[int] = mapped_column(nullable=True)
+
+    # association between Assocation -> Tournament
+    tournament: Mapped["Tournament"] = relationship(
+        back_populates="athletes_associations"
+    )
+
+    # association between Assocation -> Athlete
+    athlete: Mapped["Athlete"] = relationship(back_populates="tournaments_associations")
 
 
 class Tournament(Base):
@@ -36,6 +45,10 @@ class Tournament(Base):
     sport_id: Mapped[int] = mapped_column(ForeignKey("sports.id", ondelete="SET NULL"))
 
     sport: Mapped["Sport"] = relationship(back_populates="tournaments")
-    athletes: Mapped[list["Athlete"]] = relationship(
-        secondary="tournament_athlete_associations", back_populates="tournaments"
+    # athletes: Mapped[list["Athlete"]] = relationship(
+    #     secondary="tournament_athlete_associations", back_populates="tournaments"
+    # )
+
+    athletes_associations: Mapped[list["TournamentAthleteAssociations"]] = relationship(
+        back_populates="tournament"
     )
