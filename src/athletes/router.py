@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.athletes.models import Athlete
 from src.athletes.schemas import AthleteCreate, AthleteResponse
-from src.athletes.service import create_athlete, get_athlete, get_athletes
+from src.athletes.service import AthleteCRUD
 from src.database import get_async_session
 from src.exceptions import ResponseError
 
@@ -17,7 +17,7 @@ async def get_athletes_handler(session: AsyncSession = Depends(get_async_session
     """Получение данных всех спортсменов"""
 
     try:
-        athlete: list[Athlete] = await get_athletes(session=session)
+        athlete: list[Athlete] = await AthleteCRUD.get_athletes(session=session)
         return athlete
     except ResponseError as e:
         raise HTTPException(status_code=e.status, detail=f"{e.message}")
@@ -30,7 +30,7 @@ async def create_athlete_handler(
     """Добавление данных спортсмена в БД"""
 
     try:
-        athlete_instance: Athlete = await create_athlete(
+        athlete_instance: Athlete = await AthleteCRUD.create_athlete(
             athlete=athlete, session=session
         )
         return athlete_instance
@@ -45,7 +45,7 @@ async def get_athlete_handler(
     """Получение данных о спортсмене по id"""
 
     try:
-        athlete: Type[Athlete] = await get_athlete(id=athlete_id, session=session)
+        athlete: Type[Athlete] = await AthleteCRUD.get_athlete(id=athlete_id, session=session)
         return athlete
     except ResponseError as e:
         raise HTTPException(status_code=e.status, detail=f"{e.message}")
