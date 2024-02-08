@@ -34,6 +34,7 @@ if config.config_file_name is not None:
 
 from src.athletes.models import Sport
 from src.database import Base
+from src.tournaments.models import Tournament
 
 target_metadata = Base.metadata
 

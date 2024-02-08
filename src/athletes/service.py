@@ -12,6 +12,7 @@ from src.exceptions import ResponseError
 class AthleteCRUD:
     """Содержит методы для CRUD операций с объектами Athlete"""
 
+    @staticmethod
     async def get_athletes(session: AsyncSession) -> list[Athlete]:
         """Получение данных всех спортсменов"""
 
@@ -29,6 +30,7 @@ class AthleteCRUD:
                 e=e,
             )
 
+    @staticmethod
     async def create_athlete(athlete: AthleteCreate, session: AsyncSession) -> Athlete:
         """Добавление данных спортсмена в БД"""
 
@@ -68,14 +70,14 @@ class AthleteCRUD:
                 e=e,
             )
 
+    @staticmethod
     async def get_athlete(id: int, session: AsyncSession) -> Athlete:
         """Получение данных о спортсмене по id"""
 
-        # athlete = await session.get(Athlete, id)
         query = (
             select(Athlete).options(joinedload(Athlete.sport)).where(Athlete.id == id)
         )
-        athlete: Athlete = await session.scalar(query)
+        athlete: Athlete | None = await session.scalar(query)
         if athlete is None:
             raise ResponseError(
                 status=status.HTTP_404_NOT_FOUND,

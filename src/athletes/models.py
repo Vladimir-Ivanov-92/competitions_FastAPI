@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
+from src.tournaments.models import tournament_athlete_association_table
+
+if TYPE_CHECKING:
+    from src.tournaments.models import Tournament
 
 
 class Sport(Base):
@@ -13,6 +19,7 @@ class Sport(Base):
     name: Mapped[str]
 
     athletes: Mapped[list["Athlete"]] = relationship(back_populates="sport")
+    tournaments: Mapped[list["Tournament"]] = relationship(back_populates="sport")
 
 
 class Athlete(Base):
@@ -28,6 +35,9 @@ class Athlete(Base):
     sport_id: Mapped[int] = mapped_column(ForeignKey("sports.id", ondelete="SET NULL"))
 
     sport: Mapped["Sport"] = relationship(back_populates="athletes")
+    tournaments: Mapped[list["Tournament"]] = relationship(
+        secondary=tournament_athlete_association_table, back_populates="athletes"
+    )
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, first_name={self.first_name!r}, last_name={self.last_name})"

@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from src.athletes.router import router as router_athletes
-from src.competitions.router import router as router_competitions
+from src.tournaments.router import router as router_competitions
 
 app = FastAPI(title="Competitions App")
 
