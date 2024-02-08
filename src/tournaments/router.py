@@ -14,7 +14,6 @@ from src.tournaments.service import TournamentCRUD
 router = APIRouter(prefix="/tournaments", tags=["tournaments"])
 
 
-
 @router.get("/", response_model=list[TournamentResponseList])
 async def get_athletes_handler(session: AsyncSession = Depends(get_async_session)):
     """Получение данных всех спортсменов"""
@@ -30,20 +29,18 @@ async def get_athletes_handler(session: AsyncSession = Depends(get_async_session
     except ResponseError as e:
         raise HTTPException(status_code=e.status, detail=f"{e.message}")
 
+
 @router.get("/{year}/{month}", response_model=list[TournamentResponseList])
 async def get_tournaments_filter_year_month(
-        year: int,
-        month: int,
-        session: AsyncSession = Depends(get_async_session)
+    year: int, month: int, session: AsyncSession = Depends(get_async_session)
 ):
     """Получение данных всех спортсменов"""
 
     try:
         tournaments: list[Tournament] = (
             await TournamentCRUD.get_tournaments_filter_year_month(
-                year= year,
-                month= month,
-                session=session)
+                year=year, month=month, session=session
+            )
         )
 
         tournaments_responses = await TournamentCRUD.to_response_format(tournaments)

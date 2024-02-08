@@ -13,3 +13,4 @@ tests/migrations/versions/
 /.mypy_cache/
 /.env
 /.idea
+/.env.dev

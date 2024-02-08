@@ -1,0 +1,44 @@
+version: '3.0'
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  pg_competitions_data:
+
+services:
+  db:
+    container_name: db-postgres
+    image: postgres:13.3-alpine
+    restart: always
+    command: -p 5434
+    expose:
+      - 5434
+    ports:
+      - "5434:5434"
+    environment:
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: postgres_db
+      LC_MESSAGES: en_US.utf8
+    env_file:
+      - .env.dev
+    volumes:
+      - pg_competitions_data:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+
+  app:
+    container_name: app
+    build:
+      context: .
+    env_file:
+      - .env.dev
+    ports:
+      - "8080:8000"
+    command: ["/app/docker/app.sh"]
+    depends_on:
+      - db
+    networks:
+      - mynetwork
