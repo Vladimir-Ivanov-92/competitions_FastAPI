@@ -22,6 +22,18 @@ class TournamentCRUD:
         session: AsyncSession,
     ) -> Tournament:
         """Добавление данных по турниру в БД"""
+
+        # Проверяем, существует ли уже турнир с таким же именем в БД
+        existing_tournament = await session.execute(
+            select(Tournament).where(
+                (Tournament.name == tournament_data.tournament.name)
+            )
+        )
+        if existing_tournament.scalar():
+            raise ResponseError(
+                status=status.HTTP_400_BAD_REQUEST,
+                message="Турнир с таким названием уже существует",
+            )
         try:
             # Добавление в БД объекта Tournament с переданными данными
             tournament = Tournament(**tournament_data.tournament.model_dump())
