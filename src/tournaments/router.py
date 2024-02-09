@@ -19,7 +19,6 @@ router = APIRouter(prefix="/tournaments", tags=["tournaments"])
 
 
 @router.get("/", response_model=list[TournamentResponseList])
-@cache(expire=EXPIRE)
 async def get_tournaments_handler(session: AsyncSession = Depends(get_async_session)):
     """Получение данных всех турниров"""
 
@@ -58,7 +57,7 @@ async def get_tournaments_filter_year_month(
         raise HTTPException(status_code=e.status, detail=f"{e.message}")
 
 
-@router.post("/", response_model=TournamentResponseCreate)
+@router.post("/", response_model=TournamentResponseCreate, status_code=201)
 async def create_tournament_handler(
     tournament_data: TournamentCreate,
     session: AsyncSession = Depends(get_async_session),
