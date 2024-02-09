@@ -16,14 +16,14 @@
 - requests v2.31
 - fastapi-cache2 v0.2.1
 
-```json
+```
 get("/tournaments/") - список всех турниров c указанием участников 
  каждого турнира и занятых ими мест (в порядке убывания)
 
 Response:
 [
   {
-    "id": 0,
+    "id": int,
     "datetime": datetime,
     "sport_id": str,
     "name": str,
@@ -40,7 +40,7 @@ Response:
 ]
 ```
 
-```json
+```
 post("/tournaments/") - Добавление данных о турнире в БД
 
 Request: 
@@ -67,7 +67,7 @@ Response:
 }
 ```
 
-```json
+```
 get("/tournaments/{year}/{month}") - Получение данных всех турниров 
 с фильтром по переданным данным (год, месяц)
 
@@ -91,7 +91,7 @@ Response:
 ]
 ```
 
-```json
+```
 get("/athletes/") - Получение данных всех спортсменов
 Response:
 [
@@ -106,7 +106,7 @@ Response:
 ]
 ```
 
-```json
+```
 post("/athletes/") - Добавление данных спортсмена в БД
 
 Request: 
@@ -129,7 +129,7 @@ Response:
 }
 ```
 
-```json
+```
 get("/athletes/{athlete_id}") - Получение данных о спортсмене по id
 Response:
 {
@@ -142,7 +142,7 @@ Response:
 }
 ```
 
-```json
+```
 post("/athletes/sport") - Добавление нового вида спорта в БД
 
 Request: 
@@ -172,6 +172,7 @@ async def get_tournaments_filter_year_month()
 Необходимо наличие установленного и запущенного Docker.
 Для скачивания репозитория и разворачивания проекта локально в docker контейнере 
 (создание БД, запуск приложения):
+
 git clone https://github.com/Vladimir-Ivanov-92/DRF_API_Exchange_Rate.git
 
 Необходимо создать в текущей директории .env файл 
@@ -181,7 +182,10 @@ git clone https://github.com/Vladimir-Ivanov-92/DRF_API_Exchange_Rate.git
 выполните: 
 
 ```
-make up  - создаст Docker контейнеры "app" "db" "redis" и запустит приложение с помощью gunicorn
-make migrate - выполнит миграции БД
+make up  - создаст Docker контейнеры "app" "db" "redis" и запустит приложение 
+с помощью gunicorn
+
+make migrate"- выполнит миграции БД
+
 make down -  остановит и удалит все созданные контейнеры
 ```
