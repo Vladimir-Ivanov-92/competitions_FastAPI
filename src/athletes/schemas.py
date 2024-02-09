@@ -34,3 +34,12 @@ class AthleteCreate(BaseModel):
     age: int
     country: str
     sport_id: int
+
+
+class SportCreate(BaseModel):
+    name: str
+
+
+class SportResponse(BaseModel):
+    id: int
+    name: str

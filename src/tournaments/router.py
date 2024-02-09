@@ -38,7 +38,7 @@ async def get_tournaments_handler(session: AsyncSession = Depends(get_async_sess
 @router.get("/{year}/{month}", response_model=list[TournamentResponseList])
 @cache(expire=EXPIRE)
 async def get_tournaments_filter_year_month(
-        year: int, month: int, session: AsyncSession = Depends(get_async_session)
+    year: int, month: int, session: AsyncSession = Depends(get_async_session)
 ):
     """Получение данных всех турниров с фильтром по (год, месяц)"""
 
@@ -60,8 +60,8 @@ async def get_tournaments_filter_year_month(
 
 @router.post("/", response_model=TournamentResponseCreate)
 async def create_tournament_handler(
-        tournament_data: TournamentCreate,
-        session: AsyncSession = Depends(get_async_session),
+    tournament_data: TournamentCreate,
+    session: AsyncSession = Depends(get_async_session),
 ):
     """Добавление данных о турнире в БД"""
 
