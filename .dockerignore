@@ -1,1 +1,4 @@
 tests/
+Dockerfile
+Docker-compose.yml
+Makefile
